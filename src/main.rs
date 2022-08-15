@@ -34,12 +34,15 @@ fn main() -> anyhow::Result<()> {
     let mut collected_urls = HashSet::new();
 
     let top_url = base_url.join("index.html")?;
-    urls.push_back(top_url.clone());
-
     let oq_compooser_url = base_url.join("oq-composer/index.js")?;
-    urls.push_back(oq_compooser_url.clone());
-    let toc_map = toc_map(oq_compooser_url)?;
+    let video_player_url = base_url.join("common/video640.html")?;
 
+    urls.push_back(base_url.join("lands/02.html")?);
+    urls.push_back(top_url.clone());
+    urls.push_back(oq_compooser_url.clone());
+    urls.push_back(video_player_url.clone());
+
+    let toc_map = toc_map(oq_compooser_url)?;
     for path in toc_map.values() {
         urls.push_back(base_url.join(&path.0)?);
     }
@@ -64,7 +67,6 @@ fn main() -> anyhow::Result<()> {
             .map_or(false, |x| x.as_bytes().starts_with(b"text/html"));
         let res = res.bytes()?;
         if let Some(parent) = save_path.parent() {
-            info!("Creating directory {parent:?}");
             fs_err::create_dir_all(parent)?;
         }
         info!("Saving to {save_path:?}");
@@ -84,23 +86,30 @@ fn main() -> anyhow::Result<()> {
             .select(selector!("audio, img"))
             .filter_map(|x| x.value().attr("src"));
         for relative in href.chain(src) {
-            let url = url.join(relative)?;
-            let key = {
-                let mut url = url.clone();
+            let original_url = url.join(relative)?;
+            let mut query_pairs = original_url.query_pairs();
+            let url = {
+                let mut url = original_url.clone();
                 url.set_query(None);
                 url.set_fragment(None);
-                url == top_url
-            }
-            .then(|| {
-                url.query_pairs()
-                    .find_map(|(k, v)| (k == "page").then_some(v))
-            })
-            .flatten();
-            let url = if let Some(key) = key {
-                if let Some(url) = toc_map.get(key.as_ref()) {
-                    top_url.join(&url.0)?
+                url
+            };
+            let url = if url == top_url {
+                if let Some(key) = query_pairs.find_map(|(k, v)| (k == "page").then_some(v)) {
+                    if let Some(url) = toc_map.get(key.as_ref()) {
+                        top_url.join(&url.0)?
+                    } else {
+                        warn!("Unresolved {key:?}");
+                        continue;
+                    }
                 } else {
-                    warn!("Unresolved {key:?}");
+                    url
+                }
+            } else if url == video_player_url {
+                if let Some(src) = query_pairs.find_map(|(k, v)| (k == "src").then_some(v)) {
+                    video_player_url.join(&src)?
+                } else {
+                    warn!("Link to video640.html without src: {original_url}");
                     continue;
                 }
             } else {
