@@ -62,7 +62,7 @@ fn main() -> anyhow::Result<()> {
             .headers()
             .get(CONTENT_TYPE)
             .map_or(false, |x| x.as_bytes().starts_with(b"text/html"));
-        let res = res.text()?;
+        let res = res.bytes()?;
         if let Some(parent) = save_path.parent() {
             info!("Creating directory {parent:?}");
             fs_err::create_dir_all(parent)?;
@@ -76,7 +76,7 @@ fn main() -> anyhow::Result<()> {
         }
 
         info!("Parsing {url}");
-        let html = Html::parse_document(&res);
+        let html = Html::parse_document(&String::from_utf8_lossy(&res));
         let href = html
             .select(selector!(r#"link[rel="stylesheet"], a"#))
             .filter_map(|x| x.value().attr("href"));
