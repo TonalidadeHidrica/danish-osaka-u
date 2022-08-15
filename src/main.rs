@@ -37,7 +37,6 @@ fn main() -> anyhow::Result<()> {
     let oq_compooser_url = base_url.join("oq-composer/index.js")?;
     let video_player_url = base_url.join("common/video640.html")?;
 
-    urls.push_back(base_url.join("lands/02.html")?);
     urls.push_back(top_url.clone());
     urls.push_back(oq_compooser_url.clone());
     urls.push_back(video_player_url.clone());
@@ -47,6 +46,14 @@ fn main() -> anyhow::Result<()> {
         urls.push_back(base_url.join(&path.0)?);
     }
 
+    // Manually add
+    urls.push_back(base_url.join("../oq-composer/oq-composer.css")?);
+    urls.push_back(base_url.join("../oq-composer/oq-composer.js")?);
+    urls.push_back(base_url.join("common/base.css")?);
+    urls.push_back(base_url.join("common/layout.css")?);
+    urls.push_back(base_url.join("common/icon150-02.png")?);
+    urls.push_back(base_url.join("common/icon64.png")?);
+
     while let Some(url) = urls.pop_front() {
         if !collected_urls.insert(url.clone()) {
             continue;
@@ -54,7 +61,9 @@ fn main() -> anyhow::Result<()> {
         info!("Crawling {url}");
 
         let save_path = match base_url.make_relative(&url) {
-            Some(p) if !p.starts_with("..") => opts.directory.join(p),
+            Some(p) if !p.starts_with("..") || p.starts_with("../oq-composer/") => {
+                opts.directory.join(p)
+            }
             _ => {
                 info!("Skipping {url} because it does not start with {base_url}");
                 continue;
@@ -83,7 +92,7 @@ fn main() -> anyhow::Result<()> {
             .select(selector!(r#"link[rel="stylesheet"], a"#))
             .filter_map(|x| x.value().attr("href"));
         let src = html
-            .select(selector!("audio, img"))
+            .select(selector!(r#"audio, img, script[type="text/javascript"]"#))
             .filter_map(|x| x.value().attr("src"));
         for relative in href.chain(src) {
             let original_url = url.join(relative)?;
