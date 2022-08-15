@@ -1,0 +1,315 @@
+
+/*test用
+div {
+background-color:red;
+}
+*/
+
+/* Base */
+body {
+	font-family:"小塚ゴシック Pro R", "メイリオ", "ＭＳ Ｐゴシック", "Osaka", sans-serif;
+	background:#efefef;
+	color:0f0f0f;
+	font-size:14px;
+	
+	margin: 0px;
+}
+
+h1 {
+	margin:0px;
+	padding:0px 8px 0px 8px;
+	background-color:#999;
+	font-size:16px;
+}
+
+h2 {
+	margin:0px;
+	padding:0px 8px 0px 8px;
+	background-color:#aaa;
+	font-size:16px;
+}
+
+h3 {
+	padding:0px 8px 0px 8px;
+	background-color:#bbb;
+	font-size:15px;
+}
+
+h4 {
+	padding:0px 8px 0px 8px;
+	background-color:#ccc;
+	font-size:15px;
+}
+
+h5 {
+	padding:0px 8px 0px 8px;
+	background-color:#ddd;
+	font-size:14px;
+}
+
+h6 {
+	padding:0px 8px 0px 8px;
+	background-color:#eee;
+	font-size:14px;
+}
+
+/*
+p {
+	margin-left:8px;
+	margin-right:8px;
+}
+*/
+
+table {
+	margin-left:8px;
+	margin-right:8px;
+}
+
+a:link {
+	color:#080808;
+}
+
+a:visited {
+	color:#0f0f0f;
+}
+
+/* Page componet */
+.oq_page_component {
+	margin:0px;
+	border:0px;
+	padding:0px;
+	overflow:hidden;
+	overflow-x:hidden;
+	overflow-y:hidden;
+	height:100%;
+	width:100%;
+	
+/*background-color:#efefef;*/
+}
+
+.oq_reffer {
+	margin:0px;
+	border:0px;
+	padding:0px;
+	overflow:hidden;
+	overflow-x:hidden;
+	overflow-y:hidden;
+	height:100%;
+	width:100%;
+	position:relative;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+}
+
+.oq_header1 {
+	font-size:22px;
+	color:#efefef;
+	background-color:#333333;
+	padding:16px 8px 16px 8px;
+}
+
+.oq_header2 {
+}
+
+.oq_footer {
+	clear:left;
+	background-color:#e0e0e0;
+	padding:0px 8px 0px 8px;
+}
+
+/* Menu */
+#oq_hmenu a:link, #oq_hmenu a:visited, #oq_vmenu_all a:link, #oq_vmenu_all a:visited, #oq_vmenu_selected a:link, #oq_vmenu_selected a:visited {
+	text-decoration:none;
+}
+/*
+#oq_hmenu > .oq_menu1, #oq_hmenu > .oq_menu2, #oq_hmenu > .oq_menu3, #oq_hmenu > .oq_menu4, #oq_hmenu > .oq_menu5, #oq_hmenu > .oq_menu6 {
+	padding:0px;
+}
+*/
+.oq_menu_item {
+	padding:0px 12px 0px 12px;
+	text-indent:0px;
+}
+
+#oq_hmenu .oq_menu_item {
+	float:left;
+}
+
+.oq_menu1 {
+	background-color:#999;
+	padding:0px;
+}
+
+.oq_menu2 {
+	background-color:#aaa;
+	text-indent:0.5em;
+	padding:0px;
+}
+
+.oq_menu3 {
+	background-color:#bbb;
+	text-indent:1em;
+	padding:0px;
+}
+
+.oq_menu4 {
+	background-color:#ccc;
+	text-indent:1.5em;
+	padding:0px;
+}
+
+.oq_menu5 {
+	background-color:#ddd;
+	text-indent:2em;
+	padding:0px;
+}
+
+.oq_menu6 {
+	background-color:#eee;
+	text-indent:2.5em;
+	padding:0px;
+}
+
+.oq_selected_path {
+	background-color:rgba(255, 255, 255, 0.5);
+	font-weight:bold;
+}
+
+.oq_selected_item {
+	background-color:rgba(255, 255, 255, 0.75);
+	font-weight:bold;
+}
+
+#oq_content {
+	margin:0px;
+}
+
+.oq_title {
+	padding:0px 8px 0px 8px;
+	font-size:18px;
+	background-color:#555555;
+	color:#efefef;
+}
+
+.clear_both {
+	clear:both;
+}
+
+@media screen and (max-width:1000px) {
+.oq_menu1 {
+	font-size:48px;
+	background-color:#00ffff;
+}
+
+.oq_menu2 {
+	font-size:48px;
+}
+
+.oq_menu3 {
+	font-size:48px;
+}
+
+.oq_menu4 {
+	font-size:48px;
+}
+
+.oq_menu5 {
+	font-size:48px;
+}
+
+.oq_menu6 {
+	font-size:48px;
+}
+
+.oq_left_center_right {
+	clear:left;
+	width:100%;
+}
+
+.oq_left_center {
+	clear:left;
+	width:100%;
+}
+
+.oq_center {
+	clear:left;
+	float:none;
+}
+
+.oq_center_right {
+	clear:left;
+	width:100%;
+}
+
+}/*min-width:1px*/
+
+@media screen and (min-width:1000px) {
+.oq_base {
+	margin-left:50%;
+}
+
+/* All document */
+.oq_document {
+	width:1000px;
+	margin-left:-500px;
+}
+
+.oq_menu1 {
+	font-size:13px;
+	background-color:#00ff00;
+}
+
+.oq_menu2 {
+	font-size:13px;
+}
+
+.oq_menu3 {
+	font-size:13px;
+}
+
+.oq_menu4 {
+	font-size:13px;
+}
+
+.oq_menu5 {
+	font-size:13px;
+}
+
+.oq_menu6 {
+	font-size:13px;
+}
+
+/* main area */
+.oq_left {
+	width:200px;
+	float:left;
+}
+
+.oq_left_center_right {
+	width:999px;
+	float:left;
+}
+
+.oq_left_center {
+	width:799px;
+	float:left;
+}
+
+.oq_center {
+	width:599px;
+	float:left;
+}
+
+.oq_center_right {
+	width:799px;
+	float:left;
+}
+
+.oq_right {
+	width:200px;
+	float:left;
+}
+
+}/*min-width:1000px*/

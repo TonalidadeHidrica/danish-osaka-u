@@ -1,0 +1,96 @@
+
+/* Base */
+body {
+	font-family:"小塚ゴシック Pro R", "游ゴシック", "メイリオ", "ＭＳ Ｐゴシック", "Osaka", sans-serif;
+	background:#ffffff;
+	color:#0f0f0f;
+	font-size:14px;
+}
+
+#oqs_body {
+	position: relative;
+	width: 640px;
+	height: 360px;
+	
+	font-size: 18px;
+	background-size: 100% 100%;
+}
+
+#oqs_header, #oqs_top, #oqs_mid, #oqs_bottom {
+	position: absolute;
+
+	padding: 18px;
+
+	color: #ffffff;
+	text-shadow: 0px 0px 4px #000000;
+	font-size: 18px;
+}
+
+#oqs_header {
+	top: 36px;
+	left: 0px;
+	z-index: 11;
+}
+
+#oqs_top {
+	top: 72px;
+	left: 0px;
+	z-index: 12;
+}
+
+#oqs_mid {
+	top: 108px;
+	left: 0px;
+	z-index: 13;
+}
+
+#oqs_bottom {
+	top: 180px;
+	left: 0px;
+	z-index: 14;
+}
+
+#oqs_imagea {
+	position: absolute;
+	z-index: 2;
+	
+	top: 0px;
+	left: 0px;
+	
+	width: 640px;
+	height: 360px;
+}
+
+#oqs_video {
+	position: absolute;
+	z-index: 1;
+	
+	top: 0px;
+	left: 0px;
+	
+	width: 640px;
+	height: 360px;
+}
+
+#oqs_ui {
+	position: absolute;
+	top: 300px;
+	left: 0px;
+	z-index: 20;
+
+	width: 640ppx;
+	height: 120px;
+
+	color: #ffffff;
+}
+
+#oqs_ui button {
+	border: solid 1px rgba(255,255,255,0.75);
+	border-right: solid 1px rgba(0,0,0,0.25);
+	border-bottom: solid 1px rgba(0,0,0,0.25);
+	background-color: rgba(0,0,0,0.25);
+
+	color: #ffffff;
+	font-size: 18px;
+	font-weight: normal;
+}

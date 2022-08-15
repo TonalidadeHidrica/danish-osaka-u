@@ -1,0 +1,114 @@
+/*
+Denmark CSS
+
+Jan. 10, 2019
+Aug. 16, 2019
+*/
+
+@import "../common/base.css";
+@import "../common/layout.css";
+
+@import url("../../oq-composer/oq-composer.css");
+
+h1 {
+	color:#efefef;
+	background-color:#bd0000;
+}
+
+h2 {
+	padding:0.25em 0em 0.25em 1em;
+
+	color:#0f0f0f;/*#efefef;*/
+	background-color:#ffffff;/*#9e0000;*/
+
+	font-size:125%;
+	font-weight:normal;
+}
+
+h3 {
+	padding-left:1em;
+
+	color:#efefef;
+	background-color:#bd0000;
+
+	font-size:120%;
+	font-weight:normal;
+}
+
+h4 {
+	background-color: transparent;
+/*	background-color: #c0c0c0;*/
+}
+
+h5 {
+	background-color: transparent;
+}
+
+.oq_header1 {
+	background-color:#bd0000;
+	color:#efefef;
+
+	background-position: left center;
+	background-size: contain;
+	background-image: url("../common/icon150-02.png");
+	background-repeat: no-repeat;
+	
+	padding-left: 4em;
+}
+
+.oq_title {
+	background-color:#f7f7f7;
+	color:#0f0f0f;	
+}
+
+.header_menu {
+	float:right;
+	font-size:14px;
+}
+
+.oq_menu1 {
+	background-color:#bd0000;
+}
+
+.oq_menu2 {
+	background-color:#ce5d5d;
+}
+
+.oq_menu3 {
+	background-color:#de9595;
+}
+
+.oq_footer {
+	background-color:#bd0000;
+	color:#efefef;
+}
+
+.oq_menu_item a:link, .oq_menu_item a:visited {
+	color:#efefef;
+}
+
+.header_menu a:link, .header_menu a:visited {
+	color:#efefef;
+}
+
+.oq_page_component {
+	background-color:#ffffff;
+}
+
+.oq_selected_item {
+	background-color:#ffffff;
+	font-weight:bold;
+}
+
+
+/*
+@media screen and (max-width:1000px) {
+body {
+	font-size:28px;
+}
+
+}
+
+@media screen and (min-width:1000px) {
+}
+*/

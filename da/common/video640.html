@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+</head>
+<body>
+<video id="video_play" width="640px" height="480px"></video>
+
+<script>
+	if(document.location.search.length > 3) {
+		var tmp = document.location.search.substring(1).split('&');
+
+		for(var count = 0; count < tmp.length; count++) {
+			var tmpb = tmp[count].split('=');
+
+			document.getElementById('video_play').setAttribute(decodeURIComponent(tmpb[0]), decodeURIComponent(decodeURIComponent(tmpb[1])));
+		}
+	}
+</script>
+</body>
+</html>
