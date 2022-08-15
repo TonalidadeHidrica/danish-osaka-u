@@ -92,7 +92,9 @@ fn main() -> anyhow::Result<()> {
             .select(selector!(r#"link[rel="stylesheet"], a"#))
             .filter_map(|x| x.value().attr("href"));
         let src = html
-            .select(selector!(r#"audio, img, script[type="text/javascript"]"#))
+            .select(selector!(
+                r#"audio, img, video, script[type="text/javascript"]"#
+            ))
             .filter_map(|x| x.value().attr("src"));
         for relative in href.chain(src) {
             let original_url = url.join(relative)?;
