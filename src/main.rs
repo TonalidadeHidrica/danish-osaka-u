@@ -69,18 +69,27 @@ fn main() -> anyhow::Result<()> {
                 continue;
             }
         };
-        let res = get_blocking(url.clone())?;
-        let is_html = res
-            .headers()
-            .get(CONTENT_TYPE)
-            .map_or(false, |x| x.as_bytes().starts_with(b"text/html"));
-        let res = res.bytes()?;
-        if let Some(parent) = save_path.parent() {
-            fs_err::create_dir_all(parent)?;
-        }
-        info!("Saving to {save_path:?}");
-        fs_err::write(save_path, &res)?;
-        std::thread::sleep(Duration::from_secs_f64(0.5));
+        let (res, is_html) = if save_path.exists() {
+            info!("{save_path:?} already exists, skipping.");
+            (
+                fs_err::read(&save_path)?.into(),
+                save_path.extension().map_or(false, |x| x == "html"),
+            )
+        } else {
+            let res = get_blocking(url.clone())?;
+            let is_html = res
+                .headers()
+                .get(CONTENT_TYPE)
+                .map_or(false, |x| x.as_bytes().starts_with(b"text/html"));
+            let res = res.bytes()?;
+            if let Some(parent) = save_path.parent() {
+                fs_err::create_dir_all(parent)?;
+            }
+            info!("Saving to {save_path:?}");
+            fs_err::write(save_path, &res)?;
+            std::thread::sleep(Duration::from_secs_f64(0.5));
+            (res, is_html)
+        };
 
         if !is_html {
             continue;
