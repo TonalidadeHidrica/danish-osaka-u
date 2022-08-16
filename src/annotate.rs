@@ -4,6 +4,7 @@ use aho_corasick::{AhoCorasickBuilder, MatchKind::LeftmostLongest};
 use clap::Args;
 use danish_dictionary_parser::parse_dictionary::{Entry, OtherForm};
 use itertools::Itertools;
+use log::info;
 use markup5ever::{interface::QuirksMode, local_name, namespace_url, ns, QualName};
 use scraper::{
     node::{Element, Text},
@@ -14,6 +15,8 @@ use scraper::{
 pub struct Opts {
     dictionary: PathBuf,
     file: PathBuf,
+    #[clap(short, long)]
+    recursive: bool,
 }
 
 pub fn main(opts: Opts) -> anyhow::Result<()> {
@@ -24,7 +27,28 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
         .match_kind(LeftmostLongest)
         .build(words.keys());
 
-    let mut html = Html::parse_document(&fs_err::read_to_string(&opts.file)?).tree;
+    if opts.recursive {
+        let dir = opts.file.to_string_lossy();
+        let lands = glob::glob(&format!("{dir}/lands/*.html"))?;
+        let lessons = glob::glob(&format!("{dir}/lesson*/*.html"))?;
+        for file in lands.chain(lessons) {
+            run_file(&words, &aho, &file?)?;
+        }
+    } else {
+        run_file(&words, &aho, &opts.file)?;
+    }
+
+    Ok(())
+}
+
+fn run_file(
+    words: &HashMap<String, Vec<&Vec<&str>>>,
+    aho: &aho_corasick::AhoCorasick,
+    file: &PathBuf,
+) -> Result<(), anyhow::Error> {
+    info!("Processing {file:?}");
+
+    let mut html = Html::parse_document(&fs_err::read_to_string(&file)?).tree;
     let ids = html
         .root()
         .descendants()
@@ -84,8 +108,7 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
         quirks_mode: QuirksMode::NoQuirks,
         tree: html,
     };
-    fs_err::write(opts.file, html.html())?;
-
+    fs_err::write(file, html.html())?;
     Ok(())
 }
 
