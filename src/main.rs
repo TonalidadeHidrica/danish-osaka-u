@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use danish_osaka_u_crawler::crawl;
+use danish_osaka_u_crawler::{annotate, crawl};
 
 #[derive(Parser)]
 struct Opts {
@@ -10,6 +10,7 @@ struct Opts {
 #[derive(Subcommand)]
 enum Sub {
     Crawl(crawl::Opts),
+    Annotate(annotate::Opts),
 }
 
 pub fn main() -> anyhow::Result<()> {
@@ -17,5 +18,6 @@ pub fn main() -> anyhow::Result<()> {
     use Sub::*;
     match Opts::parse().subcommand {
         Crawl(opts) => crawl::main(opts),
+        Annotate(opts) => annotate::main(opts),
     }
 }
