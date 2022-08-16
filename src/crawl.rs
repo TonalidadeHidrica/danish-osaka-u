@@ -16,15 +16,6 @@ pub struct Opts {
     directory: PathBuf,
 }
 
-macro_rules! selector {
-    ($e: expr) => {{
-        use ::once_cell::sync::Lazy;
-        use ::scraper::Selector;
-        static SELECTOR: Lazy<Selector> = Lazy::new(|| Selector::parse($e).unwrap());
-        &*SELECTOR
-    }};
-}
-
 pub fn main(opts: Opts) -> anyhow::Result<()> {
     let base_url = Url::parse("http://el.minoh.osaka-u.ac.jp/wl/da/")?;
     let mut urls = VecDeque::new();

@@ -295,6 +295,7 @@ dependencies = [
  "glob",
  "itertools",
  "log",
+ "maplit",
  "markup5ever",
  "once_cell",
  "regex",

@@ -5,10 +5,11 @@ use clap::Args;
 use danish_dictionary_parser::parse_dictionary::{Entry, OtherForm};
 use itertools::Itertools;
 use log::info;
-use markup5ever::{interface::QuirksMode, local_name, namespace_url, ns, QualName};
+use maplit::hashmap;
+use markup5ever::{local_name, namespace_url, ns, LocalName, QualName};
 use scraper::{
     node::{Element, Text},
-    Html, Node,
+    ElementRef, Html, Node,
 };
 
 #[derive(Args)]
@@ -41,6 +42,21 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
     Ok(())
 }
 
+fn html_tag(local: LocalName) -> QualName {
+    QualName {
+        prefix: None,
+        ns: ns!(html),
+        local,
+    }
+}
+fn html_attr(local: LocalName) -> QualName {
+    QualName {
+        prefix: None,
+        ns: ns!(),
+        local,
+    }
+}
+
 fn run_file(
     words: &HashMap<String, Vec<&Vec<&str>>>,
     aho: &aho_corasick::AhoCorasick,
@@ -48,14 +64,35 @@ fn run_file(
 ) -> Result<(), anyhow::Error> {
     info!("Processing {file:?}");
 
-    let mut html = Html::parse_document(&fs_err::read_to_string(&file)?).tree;
+    let element_default = Element {
+        name: html_tag(local_name!("html")), // dummy
+        id: None,
+        classes: Default::default(),
+        attrs: Default::default(),
+    };
+
+    let mut html = Html::parse_document(&fs_err::read_to_string(&file)?);
+
+    // html.root_element()
+    //     .descendants()
+    //     .filter_map(ElementRef::wrap)
+    //     .flat_map(|x| x.value().attrs.keys())
+    //     .take(20)
+    //     .chain(vec![
+    //         &html_tag(local_name!("rel")),
+    //         &html_tag(local_name!("href")),
+    //     ])
+    //     .for_each(|x| println!("{x:?}"));
+    // return Ok(());
+
     let ids = html
+        .tree
         .root()
         .descendants()
         .filter_map(|x| x.value().is_text().then_some(x.id()))
         .collect_vec();
     for id in ids {
-        let mut replaced = html.get_mut(id).unwrap();
+        let mut replaced = html.tree.get_mut(id).unwrap();
         let text = replaced.value().as_text().unwrap().to_owned();
         let text_for_search = text.to_lowercase();
         let mut i = 0;
@@ -66,27 +103,15 @@ fn run_file(
                 }));
             }
             let mut ruby = replaced.insert_before(Node::Element(Element {
-                name: QualName {
-                    prefix: None,
-                    ns: ns!(html),
-                    local: local_name!("ruby"),
-                },
-                id: None,
-                classes: Default::default(),
-                attrs: Default::default(),
+                name: html_tag(local_name!("ruby")),
+                ..element_default.clone()
             }));
             ruby.append(Node::Text(Text {
                 text: text[m.start()..m.end()].into(),
             }));
             let mut rt = ruby.append(Node::Element(Element {
-                name: QualName {
-                    prefix: None,
-                    ns: ns!(html),
-                    local: local_name!("rt"),
-                },
-                id: None,
-                classes: Default::default(),
-                attrs: Default::default(),
+                name: html_tag(local_name!("rt")),
+                ..element_default.clone()
             }));
             let prons = &words[&text_for_search[m.start()..m.end()]];
             if prons.len() == 1 {
@@ -103,11 +128,21 @@ fn run_file(
         }
         replaced.detach();
     }
-    let html = Html {
-        errors: vec![],
-        quirks_mode: QuirksMode::NoQuirks,
-        tree: html,
-    };
+
+    // Insert custom CSS
+    let head = html.select(selector!("head")).next().unwrap().id();
+    html.tree
+        .get_mut(head)
+        .unwrap()
+        .append(Node::Element(Element {
+            name: html_tag(local_name!("link")),
+            attrs: hashmap![
+                html_attr(local_name!("rel")) => "stylesheet".into(),
+                html_attr(local_name!("href")) => "../../../patch/common.css".into(),
+            ],
+            ..element_default
+        }));
+
     fs_err::write(file, html.html())?;
     Ok(())
 }
