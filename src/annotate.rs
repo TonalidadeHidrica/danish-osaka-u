@@ -64,8 +64,11 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
                 classes: Default::default(),
                 attrs: Default::default(),
             }));
-            if let Some(&pron) = words[&text_for_search[m.start()..m.end()]].first() {
-                rt.append(Node::Text(Text { text: pron.into() }));
+            let prons = &words[&text_for_search[m.start()..m.end()]];
+            if prons.len() == 1 {
+                if let Some(&pron) = prons[0].first() {
+                    rt.append(Node::Text(Text { text: pron.into() }));
+                }
             }
             i = m.end();
         }
@@ -86,11 +89,13 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
     Ok(())
 }
 
-type WordMap<'a> = HashMap<String, &'a Vec<&'a str>>;
+type WordMap<'a> = HashMap<String, Vec<&'a Vec<&'a str>>>;
 fn to_map<'a>(words: &'a [Entry]) -> WordMap<'a> {
-    let mut map = HashMap::new();
+    let mut map: WordMap = HashMap::new();
     for word in words {
-        map.insert(word.word.to_lowercase(), &word.pronunciations);
+        map.entry(word.word.to_lowercase())
+            .or_default()
+            .push(&word.pronunciations);
         for form in &word.other_forms {
             process_other_form(&mut map, form);
         }
@@ -101,7 +106,9 @@ fn to_map<'a>(words: &'a [Entry]) -> WordMap<'a> {
     map
 }
 pub fn process_other_form<'a>(map: &mut WordMap<'a>, form: &'a OtherForm) {
-    map.insert(form.word.to_lowercase(), &form.pronunciations);
+    map.entry(form.word.to_lowercase())
+        .or_default()
+        .push(&form.pronunciations);
     for form in &form.slahsed {
         process_other_form(map, form);
     }
