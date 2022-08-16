@@ -9,7 +9,7 @@ use maplit::hashmap;
 use markup5ever::{local_name, namespace_url, ns, LocalName, QualName};
 use scraper::{
     node::{Element, Text},
-    ElementRef, Html, Node,
+    Html, Node,
 };
 
 #[derive(Args)]
