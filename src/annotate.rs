@@ -73,18 +73,6 @@ fn run_file(
 
     let mut html = Html::parse_document(&fs_err::read_to_string(&file)?);
 
-    // html.root_element()
-    //     .descendants()
-    //     .filter_map(ElementRef::wrap)
-    //     .flat_map(|x| x.value().attrs.keys())
-    //     .take(20)
-    //     .chain(vec![
-    //         &html_tag(local_name!("rel")),
-    //         &html_tag(local_name!("href")),
-    //     ])
-    //     .for_each(|x| println!("{x:?}"));
-    // return Ok(());
-
     let ids = html
         .tree
         .root()
