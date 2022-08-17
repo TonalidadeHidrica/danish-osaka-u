@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use aho_corasick::{AhoCorasickBuilder, MatchKind::LeftmostLongest};
 use clap::Args;
-use danish_dictionary_parser::parse_dictionary::{Entry, OtherForm};
+use danish_dictionary_parser::parse_dictionary::{Entry, OtherForm, Pos};
 use itertools::Itertools;
 use log::info;
 use maplit::hashmap;
@@ -58,7 +58,7 @@ fn html_attr(local: LocalName) -> QualName {
 }
 
 fn run_file(
-    words: &HashMap<String, Vec<&Vec<&str>>>,
+    words: &WordMap,
     aho: &aho_corasick::AhoCorasick,
     file: &PathBuf,
 ) -> Result<(), anyhow::Error> {
@@ -90,8 +90,12 @@ fn run_file(
                     text: text[i..m.start()].into(),
                 }));
             }
+            let prons = &words[&text_for_search[m.start()..m.end()]];
             let mut ruby = replaced.insert_before(Node::Element(Element {
                 name: html_tag(local_name!("ruby")),
+                attrs: hashmap![
+                    html_attr("data-candidates".into()) => serde_json::to_string(&prons)?.into(),
+                ],
                 ..element_default.clone()
             }));
             ruby.append(Node::Text(Text {
@@ -101,9 +105,8 @@ fn run_file(
                 name: html_tag(local_name!("rt")),
                 ..element_default.clone()
             }));
-            let prons = &words[&text_for_search[m.start()..m.end()]];
-            if prons.len() == 1 {
-                if let Some(&pron) = prons[0].first() {
+            if !prons.is_empty() && prons.iter().map(|x| x.1).all_equal() {
+                if let Some(&pron) = prons[0].1.first() {
                     rt.append(Node::Text(Text { text: pron.into() }));
                 }
             }
@@ -119,43 +122,52 @@ fn run_file(
 
     // Insert custom CSS
     let head = html.select(selector!("head")).next().unwrap().id();
-    html.tree
-        .get_mut(head)
-        .unwrap()
-        .append(Node::Element(Element {
-            name: html_tag(local_name!("link")),
-            attrs: hashmap![
-                html_attr(local_name!("rel")) => "stylesheet".into(),
-                html_attr(local_name!("href")) => "../../../patch/common.css".into(),
-            ],
-            ..element_default
-        }));
+    let mut head = html.tree.get_mut(head).unwrap();
+    head.append(Node::Element(Element {
+        name: html_tag(local_name!("link")),
+        attrs: hashmap![
+            html_attr(local_name!("rel")) => "stylesheet".into(),
+            html_attr(local_name!("href")) => "../../../patch/common.css".into(),
+        ],
+        ..element_default.clone()
+    }));
+    head.append(Node::Element(Element {
+        name: html_tag(local_name!("script")),
+        attrs: hashmap![
+            html_attr(local_name!("src")) => "../../../patch/common.js".into(),
+        ],
+        ..element_default
+    }));
 
     fs_err::write(file, html.html())?;
     Ok(())
 }
 
-type WordMap<'a> = HashMap<String, Vec<&'a Vec<&'a str>>>;
+type WordMap<'a> = HashMap<String, Vec<(&'a Vec<Pos>, &'a Vec<&'a str>)>>;
 fn to_map<'a>(words: &'a [Entry]) -> WordMap<'a> {
     let mut map: WordMap = HashMap::new();
     for word in words {
-        map.entry(word.word.to_lowercase())
-            .or_default()
-            .push(&word.pronunciations);
+        if !word.pronunciations.is_empty() {
+            map.entry(word.word.to_lowercase())
+                .or_default()
+                .push((&word.pos, &word.pronunciations));
+        }
         for form in &word.other_forms {
-            process_other_form(&mut map, form);
+            process_other_form(&mut map, &word.pos, form);
         }
         for form in &word.other_adjective_forms {
-            process_other_form(&mut map, form);
+            process_other_form(&mut map, &word.pos, form);
         }
     }
     map
 }
-pub fn process_other_form<'a>(map: &mut WordMap<'a>, form: &'a OtherForm) {
-    map.entry(form.word.to_lowercase())
-        .or_default()
-        .push(&form.pronunciations);
+pub fn process_other_form<'a>(map: &mut WordMap<'a>, pos: &'a Vec<Pos>, form: &'a OtherForm) {
+    if !form.pronunciations.is_empty() {
+        map.entry(form.word.to_lowercase())
+            .or_default()
+            .push((pos, &form.pronunciations));
+    }
     for form in &form.slahsed {
-        process_other_form(map, form);
+        process_other_form(map, pos, form);
     }
 }
