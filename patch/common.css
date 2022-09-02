@@ -1,3 +1,5 @@
+/* Rubies */
+
 rt {
 	font-weight: normal;
 	font-family: "Arial";
@@ -20,4 +22,14 @@ div#overlay {
 div#menu-wrapper {
 	margin: auto;
 	background-color: white;
+}
+
+/* Dark mode */
+.oq_page_component, body, td, th, h2 {
+	background-color: black;
+	color: white;
+}
+
+img {
+	filter: invert(1);
 }
