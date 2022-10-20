@@ -25,6 +25,7 @@ div#menu-wrapper {
 }
 
 /* Dark mode */
+/* Disable for now
 .oq_page_component, body, td, th, h2 {
 	background-color: black;
 	color: white;
@@ -33,3 +34,4 @@ div#menu-wrapper {
 img {
 	filter: invert(1);
 }
+*/
