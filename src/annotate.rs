@@ -15,7 +15,8 @@ use scraper::{
 #[derive(Args)]
 pub struct Opts {
     dictionary: PathBuf,
-    file: PathBuf,
+    input: PathBuf,
+    output: PathBuf,
     #[clap(short, long)]
     recursive: bool,
 }
@@ -29,14 +30,16 @@ pub fn main(opts: Opts) -> anyhow::Result<()> {
         .build(words.keys());
 
     if opts.recursive {
-        let dir = opts.file.to_string_lossy();
-        let lands = glob::glob(&format!("{dir}/lands/*.html"))?;
-        let lessons = glob::glob(&format!("{dir}/lesson*/*.html"))?;
-        for file in lands.chain(lessons) {
-            run_file(&words, &aho, &file?)?;
+        let input = opts.input.to_string_lossy();
+        let lands = glob::glob(&format!("{input}/lands/*.html"))?;
+        let lessons = glob::glob(&format!("{input}/lesson*/*.html"))?;
+        for input in lands.chain(lessons) {
+            let input = input?;
+            let output = opts.output.join(input.strip_prefix(&opts.input)?);
+            run_file(&words, &aho, &input, &output)?;
         }
     } else {
-        run_file(&words, &aho, &opts.file)?;
+        run_file(&words, &aho, &opts.input, &opts.output)?;
     }
 
     Ok(())
@@ -60,9 +63,10 @@ fn html_attr(local: LocalName) -> QualName {
 fn run_file(
     words: &WordMap,
     aho: &aho_corasick::AhoCorasick,
-    file: &PathBuf,
+    input: &PathBuf,
+    output: &PathBuf,
 ) -> Result<(), anyhow::Error> {
-    info!("Processing {file:?}");
+    info!("Processing {input:?}");
 
     let element_default = Element {
         name: html_tag(local_name!("html")), // dummy
@@ -71,7 +75,7 @@ fn run_file(
         attrs: Default::default(),
     };
 
-    let mut html = Html::parse_document(&fs_err::read_to_string(&file)?);
+    let mut html = Html::parse_document(&fs_err::read_to_string(&input)?);
 
     let ids = html
         .tree
@@ -139,7 +143,10 @@ fn run_file(
         ..element_default
     }));
 
-    fs_err::write(file, html.html())?;
+    if let Some(parent) = output.parent() {
+        fs_err::create_dir_all(parent)?;
+    }
+    fs_err::write(output, html.html())?;
     Ok(())
 }
 
