@@ -131,14 +131,14 @@ fn run_file(
         name: html_tag(local_name!("link")),
         attrs: hashmap![
             html_attr(local_name!("rel")) => "stylesheet".into(),
-            html_attr(local_name!("href")) => "../../../patch/common.css".into(),
+            html_attr(local_name!("href")) => "../../patch/common.css".into(),
         ],
         ..element_default.clone()
     }));
     head.append(Node::Element(Element {
         name: html_tag(local_name!("script")),
         attrs: hashmap![
-            html_attr(local_name!("src")) => "../../../patch/common.js".into(),
+            html_attr(local_name!("src")) => "../../patch/common.js".into(),
         ],
         ..element_default
     }));
